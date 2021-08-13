@@ -1,14 +1,15 @@
-import 'dart:convert';
+//import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
+//import 'dart:typed_data';
 //import 'package:cross_file/src/types/interface.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:flutter/services.dart';
-import 'package:path_provider/path_provider.dart';
+//import 'package:path_provider/path_provider.dart';
 import 'package:location/location.dart';
 import 'package:intl/intl.dart';
+import 'package:waste/models/waste.dart';
 
 class NewPost extends StatefulWidget {
   final File imageFile;
@@ -27,14 +28,14 @@ class _NewPostState extends State<NewPost> {
   late File imgFile;
   late bool srvcOn;
   late PermissionStatus prmsGrnt;
+  late Waste _currWaste = Waste();
 
   Future uploadImage() async {
     String fileName = basename(widget.imageFile.path);
     Reference reference =
         FirebaseStorage.instance.ref().child('files/$fileName');
-    await reference.putFile(widget.imageFile);
-    //UploadTask uploadTask = reference.putFile(imagePath);
-    //uploadTask.whenComplete(() async => url = await reference.getDownloadURL());
+    // await reference.putFile(widget.imageFile);
+    // uploadTask.whenComplete(() async => url = await reference.getDownloadURL());
     //await uploadBytes(quantity);
   }
 
@@ -137,7 +138,11 @@ class _NewPostState extends State<NewPost> {
             onChanged: (value) {
               // quantity = value;
               setState(() {
-                quantity = value;
+                _currWaste.quantity = int.parse('value');
+                _currWaste.latitude = lctnData.latitude;
+                _currWaste.longitude = lctnData.longitude;
+                _currWaste.imageUrl = imageUrl;
+                _currWaste.date = dateTimeStr(DateTime.now()) as DateTime?;
               });
             },
             validator: (var value) {
