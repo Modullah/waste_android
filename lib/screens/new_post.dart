@@ -1,15 +1,12 @@
-//import 'dart:convert';
-import 'dart:io';
-//import 'dart:typed_data';
-//import 'package:cross_file/src/types/interface.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:flutter/services.dart';
-//import 'package:path_provider/path_provider.dart';
 import 'package:location/location.dart';
-import 'package:intl/intl.dart';
 import 'package:waste/models/waste.dart';
+import 'package:uuid/uuid.dart';
+import 'dart:io';
 
 class NewPost extends StatefulWidget {
   final File imageFile;
@@ -23,8 +20,10 @@ class NewPost extends StatefulWidget {
 
 class _NewPostState extends State<NewPost> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
   late LocationData lctnData;
-  var quantity, imgUrl;
+  var quantity, imageUrl;
+  var uuid = Uuid().v4();
   late File imgFile;
   late bool srvcOn;
   late PermissionStatus prmsGrnt;
@@ -34,10 +33,10 @@ class _NewPostState extends State<NewPost> {
     String fileName = basename(widget.imageFile.path);
     await FirebaseStorage.instance
         .ref()
-        .child('files/$fileName')
+        .child('files/$uuid/$fileName')
         .putFile(widget.imageFile);
 
-    imgUrl = await FirebaseStorage.instance
+    imageUrl = await FirebaseStorage.instance
         .ref()
         .child('files/$fileName')
         .getDownloadURL();
@@ -84,7 +83,7 @@ class _NewPostState extends State<NewPost> {
         : prmsGrnt = PermissionStatus.denied;
 
     lctnData = await lcSrvc.getLocation();
-    setState(() {});
+    //setState(() {});
   }
 
   @override
@@ -109,11 +108,11 @@ class _NewPostState extends State<NewPost> {
           ],
         ),
       ),
-      bottomNavigationBar: uploadButton(),
+      bottomNavigationBar: uploadButton(context),
     );
   }
 
-  uploadButton() {
+  uploadButton(context) {
     return InkWell(
         child: Container(
             height: 50,
@@ -122,9 +121,24 @@ class _NewPostState extends State<NewPost> {
         splashColor: Colors.blueAccent,
         onTap: () async {
           if (_formKey.currentState!.validate()) {
+            _formKey.currentState!.save();
             await uploadImage();
+            await uploadWaste(_currWaste);
+            Navigator.of(context).pop();
           }
         });
+  }
+
+  uploadWaste(Waste _currWaste) async {
+    CollectionReference wasteRef =
+        FirebaseFirestore.instance.collection('waste');
+    wasteRef.add({
+      'quantity': _currWaste.quantity,
+      'latitude': _currWaste.latitude,
+      'longitude': _currWaste.longitude,
+      'imageUrl': _currWaste.imageUrl,
+      'date': _currWaste.date,
+    });
   }
 
   Widget form() {
@@ -148,10 +162,10 @@ class _NewPostState extends State<NewPost> {
                 _currWaste.quantity = int.parse('value');
                 _currWaste.latitude = lctnData.latitude;
                 _currWaste.longitude = lctnData.longitude;
-                _currWaste.imageUrl = imgUrl;
-                _currWaste.date = dateTimeStr(DateTime.now()) as DateTime?;
+                _currWaste.imageUrl = imageUrl;
+                _currWaste.date = DateTime.now();
               });
-            },
+            }, //dateTimeStr(DateTime.now()) as DateTime?
             validator: (var value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter a value.';
@@ -165,11 +179,4 @@ class _NewPostState extends State<NewPost> {
       ),
     );
   }
-
-  String dateTimeStr(DateTime date) {
-    return DateFormat('EEEE, MMMM d, ' 'yyyy').format(date);
-  }
 }
-
-
-//var imgPkrTmp = imgPkr;  //File imagePath = File(_imgFile.path); //creates file path
