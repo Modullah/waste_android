@@ -20,6 +20,7 @@ class _ListState extends State<List> {
     navNewPost(imageFile);
   }
 
+  //download data from db
   CollectionReference ref = FirebaseFirestore.instance.collection('waste');
 
   @override

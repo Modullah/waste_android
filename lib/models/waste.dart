@@ -1,10 +1,10 @@
-import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Waste {
   int? quantity;
   double? latitude, longitude;
   String? imageUrl;
-  DateTime? date;
+  Timestamp? date;
 
   Waste([
     this.quantity,
@@ -32,7 +32,8 @@ class Waste {
     };
   }
 
-  String dateTimeStr(DateTime date) {
-    return DateFormat('EEEE, MMMM d, ' 'yyyy').format(date);
+  String dateTime() {
+    DateTime now = DateTime.now();
+    return "${now.day.toString()}, ${now.month.toString()}, ${now.year.toString()}";
   }
 }
