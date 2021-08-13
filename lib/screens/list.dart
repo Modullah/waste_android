@@ -14,7 +14,7 @@ class List extends StatefulWidget {
 class _ListState extends State<List> {
   //File? image;
   Future pickImage(ImageSource source) async {
-    XFile? imagePicker = await ImagePicker().pickImage(source: source);
+    final imagePicker = await ImagePicker().pickImage(source: source);
     imagePicker == null ? print('null exception') : navNewPost(imagePicker);
     //final image = File(imagePicker!.path);
   }
