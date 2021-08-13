@@ -24,7 +24,7 @@ class NewPost extends StatefulWidget {
 class _NewPostState extends State<NewPost> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late LocationData lctnData;
-  var quantity;
+  var quantity, imgUrl;
   late File imgFile;
   late bool srvcOn;
   late PermissionStatus prmsGrnt;
@@ -32,8 +32,15 @@ class _NewPostState extends State<NewPost> {
 
   Future uploadImage() async {
     String fileName = basename(widget.imageFile.path);
-    Reference reference =
-        FirebaseStorage.instance.ref().child('files/$fileName');
+    await FirebaseStorage.instance
+        .ref()
+        .child('files/$fileName')
+        .putFile(widget.imageFile);
+
+    imgUrl = await FirebaseStorage.instance
+        .ref()
+        .child('files/$fileName')
+        .getDownloadURL();
     // await reference.putFile(widget.imageFile);
     // uploadTask.whenComplete(() async => url = await reference.getDownloadURL());
     //await uploadBytes(quantity);
@@ -141,7 +148,7 @@ class _NewPostState extends State<NewPost> {
                 _currWaste.quantity = int.parse('value');
                 _currWaste.latitude = lctnData.latitude;
                 _currWaste.longitude = lctnData.longitude;
-                _currWaste.imageUrl = imageUrl;
+                _currWaste.imageUrl = imgUrl;
                 _currWaste.date = dateTimeStr(DateTime.now()) as DateTime?;
               });
             },

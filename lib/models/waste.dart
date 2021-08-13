@@ -1,4 +1,4 @@
-import 'package:intl/intl.dart';
+//import 'package:intl/intl.dart';
 //import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Waste {
@@ -33,9 +33,9 @@ class Waste {
     };
   }
 
-  String dateTimeStr(DateTime date) {
-    return DateFormat('EEEE, MMMM d, ' 'yyyy').format(date);
-  }
+  // String dateTimeStr(DateTime date) {
+  //   return DateFormat('EEEE, MMMM d, ' 'yyyy').format(date);
+  // }
 }
 
 // Waste.fromSnapshot({required DocumentSnapshot snapshot}) {
