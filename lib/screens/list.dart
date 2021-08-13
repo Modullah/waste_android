@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
+//import 'dart:io';
 
 import 'package:waste/screens/new_post.dart';
 
@@ -15,9 +15,8 @@ class _ListState extends State<List> {
   //File? image;
   Future pickImage(ImageSource source) async {
     XFile? imagePicker = await ImagePicker().pickImage(source: source);
-    imagePicker == null ? print('null exception') : navNewPost(XFile imagePicker);
+    imagePicker == null ? print('null exception') : navNewPost(imagePicker);
     //final image = File(imagePicker!.path);
-    
   }
 
   CollectionReference ref = FirebaseFirestore.instance.collection('waste');
@@ -55,7 +54,7 @@ class _ListState extends State<List> {
         onPressed: () => pickImage(ImageSource.gallery));
   }
 
-  void navNewPost([XFile imagePicker]) async {
+  void navNewPost(XFile? imagePicker) async {
     await Navigator.push(
         context,
         MaterialPageRoute(
