@@ -27,7 +27,7 @@ class _NewPostState extends State<NewPost> {
   late File imgFile;
   late bool srvcOn;
   late PermissionStatus prmsGrnt;
-  late Waste _currWaste = Waste();
+  late Waste currWaste = Waste();
 
   Future uploadImage() async {
     String fileName = basename(widget.imageFile.path);
@@ -69,7 +69,7 @@ class _NewPostState extends State<NewPost> {
     super.initState();
     imgFile = File(this.widget.imageFile.path); //creates File obj
     rtrvLctn(); //retrieveLocation
-    _currWaste = Waste();
+    currWaste = Waste();
   }
 
   void rtrvLctn() async {
@@ -84,7 +84,7 @@ class _NewPostState extends State<NewPost> {
         : prmsGrnt = PermissionStatus.denied;
 
     lctnData = await lcSrvc.getLocation();
-    //setState(() {});
+    setState(() {});
   }
 
   @override
@@ -122,14 +122,14 @@ class _NewPostState extends State<NewPost> {
             _formKey.currentState!.save();
             await uploadImage();
             if (imageUrl != null) {
-              await uploadWaste(_currWaste);
+              await uploadWaste(currWaste);
               Navigator.of(context).pop();
             }
           }
         });
   }
 
-  uploadWaste(Waste _currWaste) async {
+  uploadWaste(Waste currWaste) async {
     // CollectionReference wasteRef =
     //     FirebaseFirestore.instance.collection('waste');
     // FirebaseFirestore.instance.runTransaction((Transaction transaction) async {
@@ -147,11 +147,11 @@ class _NewPostState extends State<NewPost> {
       "date": "$date",
     });
     // await reference.add({
-    //   "quantity": _currWaste.quantity,
-    //   "latitude": _currWaste.latitude,
-    //   "longitude": _currWaste.longitude,
-    //   "imageUrl": _currWaste.imageUrl,
-    //   "date": _currWaste.date,
+    //   "quantity": currWaste.quantity,
+    //   "latitude": currWaste.latitude,
+    //   "longitude": currWaste.longitude,
+    //   "imageUrl": currWaste.imageUrl,
+    //   "date": currWaste.date,
     // });
   }
 
@@ -172,13 +172,13 @@ class _NewPostState extends State<NewPost> {
             onChanged: (value) {
               // quantity = value;
               setState(() {
-                _currWaste.quantity = int.parse(value);
-                _currWaste.latitude =
+                currWaste.quantity = int.parse(value);
+                currWaste.latitude =
                     lctnData.latitude; //latitude returns a double
-                _currWaste.longitude =
+                currWaste.longitude =
                     lctnData.longitude; //longitude returns a double
-                _currWaste.imageUrl = imageUrl;
-                _currWaste.date = Timestamp.now();
+                currWaste.imageUrl = imageUrl;
+                currWaste.date = Timestamp.now();
               });
             },
             validator: (var value) {
