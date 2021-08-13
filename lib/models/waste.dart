@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Waste {
   int? quantity;
   double? latitude, longitude;
-  String? imageUrl;
+  String? id, imageUrl;
   Timestamp? date;
 
   Waste([
@@ -12,6 +12,7 @@ class Waste {
     this.longitude,
     this.imageUrl,
     this.date,
+    this.id,
   ]);
 
   Waste.fromMap(Map<String, dynamic> data) {
@@ -20,10 +21,12 @@ class Waste {
     longitude = data['longitude'];
     imageUrl = data['imageUrl'];
     date = data['date'];
+    id = data['id'];
   }
 
   Map<String, dynamic> toMap() {
     return {
+      'id': id,
       'quantity': quantity,
       'latitude': latitude,
       'longitude': longitude,

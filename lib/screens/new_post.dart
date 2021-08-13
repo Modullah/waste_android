@@ -121,10 +121,8 @@ class _NewPostState extends State<NewPost> {
           if (_formKey.currentState!.validate()) {
             _formKey.currentState!.save();
             await uploadImage();
-            if (imageUrl != null) {
-              await uploadWaste(currWaste);
-              Navigator.of(context).pop();
-            }
+            await uploadWaste(currWaste);
+            Navigator.of(context).pop();
           }
         });
   }
@@ -133,11 +131,18 @@ class _NewPostState extends State<NewPost> {
     // CollectionReference wasteRef =
     //     FirebaseFirestore.instance.collection('waste');
     // FirebaseFirestore.instance.runTransaction((Transaction transaction) async {
-    CollectionReference reference =
-        FirebaseFirestore.instance.collection('waste');
+    // CollectionReference reference =
+    //     FirebaseFirestore.instance.collection('waste');
 
     //await ({"Title": "$title", "Author": "$author"});
     // });
+    final DocumentReference documentReference = 
+   var collection = FirebaseFirestore.instance.collection('waste');
+collection 
+    .doc('some_id') // <-- Doc ID where data should be updated.
+    .update({'key' : 'value'}) // <-- Updated data
+    .then((_) => print('Updated'))
+    .catchError((error) => print('Update failed: $error'));
 
     await reference.add({
       "quantity": "$quantity",
