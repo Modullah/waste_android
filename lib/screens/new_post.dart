@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:location/location.dart';
+import 'package:intl/intl.dart';
 
 class NewPost extends StatefulWidget {
   final File imageFile;
@@ -20,9 +22,12 @@ class NewPost extends StatefulWidget {
 
 class _NewPostState extends State<NewPost> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  //var url;
+  late LocationData lctnData;
   var quantity;
   late File imgFile;
+  late bool srvcOn;
+  late PermissionStatus prmsGrnt;
+
   Future uploadImage() async {
     String fileName = basename(widget.imageFile.path);
     Reference reference =
@@ -55,13 +60,24 @@ class _NewPostState extends State<NewPost> {
   @override
   void initState() {
     super.initState();
-    //imgPkr = File(widget.imagePicker!.path);
     imgFile = File(this.widget.imageFile.path); //creates File obj
+    rtrvLctn(); //retrieveLocation
   }
 
-  // Widget Img() {
-  //   return Image.file(imagePath);
-  // }
+  void rtrvLctn() async {
+    var lcSrvc = Location(); //lcSrvc is locationService
+    srvcOn = await lcSrvc.serviceEnabled(); //type boolean
+    !srvcOn ? srvcOn = await lcSrvc.requestService() : srvcOn = false;
+
+    prmsGrnt = await lcSrvc.hasPermission(); //type PermissionStatus, if granted
+
+    prmsGrnt == PermissionStatus.denied
+        ? prmsGrnt = await lcSrvc.requestPermission()
+        : prmsGrnt = PermissionStatus.denied;
+
+    lctnData = await lcSrvc.getLocation();
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -136,6 +152,10 @@ class _NewPostState extends State<NewPost> {
         ],
       ),
     );
+  }
+
+  String dateTimeStr(DateTime date) {
+    return DateFormat('EEEE, MMMM d, ' 'yyyy').format(date);
   }
 }
 
