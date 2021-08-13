@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "433486462069",
+    "project_id": "waste-android",
+    "storage_bucket": "waste-android.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:433486462069:android:1446565e3619c1ef26cc3c",
+        "android_client_info": {
+          "package_name": "edu.oregonstate.adlounim.waste"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "433486462069-rijbmt34ahsg1snefoduc8fflp2v7gtb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDlONxC1OuJ8BJ8YFadWzYH1oRTSKWgxos"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "433486462069-rijbmt34ahsg1snefoduc8fflp2v7gtb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
