@@ -1,13 +1,12 @@
-//import 'dart:convert';
+import 'dart:convert';
 import 'dart:io';
-//import 'dart:typed_data';
+import 'dart:typed_data';
 //import 'package:cross_file/src/types/interface.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-//import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
-//import 'package:flutter/services.dart';
-//import 'package:path_provider/path_provider.dart';
+import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
 
 class NewPost extends StatefulWidget {
   final File imageFile;
@@ -20,33 +19,31 @@ class NewPost extends StatefulWidget {
 }
 
 class _NewPostState extends State<NewPost> {
-  //final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   //var url;
-  //var quantity;
+  var quantity;
   late File imgFile;
   Future uploadImage() async {
-    //var imgPkrTmp = imgPkr;
     String fileName = basename(widget.imageFile.path);
-    //File imagePath = File(_imgFile.path); //creates file path
     Reference reference =
         FirebaseStorage.instance.ref().child('files/$fileName');
     await reference.putFile(widget.imageFile);
-    //print(imgFile);
-    //await uploadBytes(quantity);
     //UploadTask uploadTask = reference.putFile(imagePath);
     //uploadTask.whenComplete(() async => url = await reference.getDownloadURL());
+    //await uploadBytes(quantity);
   }
 
   // uploadBytes(String val) async {
   //   var valStrPath = await _createFileFromString(val);
+  //   String valName = basename(valStrPath);
   //   final valFileObj = File(valStrPath);
   //   Reference reference =
-  //       FirebaseStorage.instance.ref().child(valFileObj.toString());
-  //   reference.putFile(valFileObj);
+  //       FirebaseStorage.instance.ref().child('files/$valName');
+  //   await reference.putFile(valFileObj);
   // }
 
   // Future<String> _createFileFromString(String val) async {
-  //   final encodedStr = quantity;
+  //   final encodedStr = val;
   //   Uint8List bytes = base64.decode(encodedStr);
   //   String dir = (await getApplicationDocumentsDirectory()).path;
   //   File file = File(
@@ -84,7 +81,7 @@ class _NewPostState extends State<NewPost> {
                     width: MediaQuery.of(context).size.width,
                     child: Image.file(widget.imageFile,
                         height: height, fit: BoxFit.cover)),
-            //form()
+            form()
           ],
         ),
       ),
@@ -98,42 +95,49 @@ class _NewPostState extends State<NewPost> {
             height: 50,
             color: Colors.blueAccent.shade100,
             child: Icon(Icons.cloud_upload, size: 50)),
+        splashColor: Colors.blueAccent,
         onTap: () async {
-          //if (_formKey.currentState!.validate()) {
-          await uploadImage();
-          //}
+          if (_formKey.currentState!.validate()) {
+            await uploadImage();
+          }
         });
   }
 
-  // Widget form() {
-  //   return Form(
-  //     key: _formKey,
-  //     child: Column(
-  //       crossAxisAlignment: CrossAxisAlignment.start,
-  //       children: <Widget>[
-  //         TextFormField(
-  //           decoration: const InputDecoration(
-  //             hintText: 'Number of Wasted Items',
-  //           ),
-  //           keyboardType: TextInputType.number,
-  //           textAlign: TextAlign.center,
-  //           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-  //           //decoration: InputDecoration(contentPadding: EdgeInsets.all(5)),
-  //           maxLength: 10,
-  //           onChanged: (value) {
-  //             quantity = value;
-  //           },
-  //           validator: (var value) {
-  //             if (value == null || value.isEmpty) {
-  //               return 'Please enter a value.';
-  //             } else {
-  //               print('Error');
-  //             }
-  //             return null;
-  //           },
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
+  Widget form() {
+    return Form(
+      key: _formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          TextFormField(
+            decoration: const InputDecoration(
+              hintText: 'Number of Wasted Items',
+            ),
+            keyboardType: TextInputType.number,
+            textAlign: TextAlign.center,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            //decoration: InputDecoration(contentPadding: EdgeInsets.all(5)),
+            maxLength: 10,
+            onChanged: (value) {
+              // quantity = value;
+              setState(() {
+                quantity = value;
+              });
+            },
+            validator: (var value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter a value.';
+              } else {
+                print('Error');
+              }
+              return null;
+            },
+          ),
+        ],
+      ),
+    );
+  }
 }
+
+
+//var imgPkrTmp = imgPkr;  //File imagePath = File(_imgFile.path); //creates file path
