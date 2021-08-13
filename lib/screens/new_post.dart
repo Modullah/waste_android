@@ -89,15 +89,15 @@ class _NewPostState extends State<NewPost> {
     );
   }
 
-  uploadButton() async {
+  uploadButton() {
     return InkWell(
         child: Container(
             height: 50,
             color: Colors.blueAccent.shade100,
             child: Icon(Icons.cloud_upload, size: 50)),
-        onTap: () {
+        onTap: () async {
           //if (_formKey.currentState!.validate()) {
-          uploadImage();
+          await uploadImage();
           //}
         });
   }
