@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
+
+import 'package:waste/screens/new_post.dart';
 
 class List extends StatefulWidget {
   const List({Key? key}) : super(key: key);
@@ -11,24 +12,10 @@ class List extends StatefulWidget {
 }
 
 class _ListState extends State<List> {
-  File? image;
-  var url;
-
   Future pickImage(ImageSource source) async {
-    final image = await ImagePicker().pickImage(source: source);
-    final imagePath = File(image!.path);
-    Reference reference =
-        FirebaseStorage.instance.ref().child(image.toString());
-    UploadTask uploadTask = reference.putFile(imagePath);
-
-    uploadTask.whenComplete(() async {
-      url = await reference.getDownloadURL();
-      print(url);
-    }).catchError((onError) {
-      print(onError);
-    });
-
-    print(url);
+    XFile? imagePicker = await ImagePicker().pickImage(source: source);
+    final image = File(imagePicker!.path);
+    navNewPost(image);
   }
 
   CollectionReference ref = FirebaseFirestore.instance.collection('waste');
@@ -62,12 +49,17 @@ class _ListState extends State<List> {
 
   Widget camera() {
     return FloatingActionButton(
-      child: Icon(Icons.camera_alt),
-      onPressed: () => pickImage(ImageSource.gallery),
-    );
+        child: Icon(Icons.camera_alt),
+        onPressed: () => pickImage(ImageSource.gallery));
+  }
+
+  void navNewPost(image) async {
+    await Navigator.push(context,
+        MaterialPageRoute(builder: (context) => NewPost(image: image)));
   }
 }
 
+//[pickImage(ImageSource.gallery)]
 // crclProgInd() {
 //   return Center(child: CircularProgressIndicator());
 // }
