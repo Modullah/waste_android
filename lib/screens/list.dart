@@ -12,10 +12,12 @@ class List extends StatefulWidget {
 }
 
 class _ListState extends State<List> {
+  //File? image;
   Future pickImage(ImageSource source) async {
     XFile? imagePicker = await ImagePicker().pickImage(source: source);
-    final image = File(imagePicker!.path);
-    navNewPost(image);
+    imagePicker == null ? print('null exception') : navNewPost(XFile imagePicker);
+    //final image = File(imagePicker!.path);
+    
   }
 
   CollectionReference ref = FirebaseFirestore.instance.collection('waste');
@@ -53,9 +55,11 @@ class _ListState extends State<List> {
         onPressed: () => pickImage(ImageSource.gallery));
   }
 
-  void navNewPost(image) async {
-    await Navigator.push(context,
-        MaterialPageRoute(builder: (context) => NewPost(image: image)));
+  void navNewPost([XFile imagePicker]) async {
+    await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => NewPost(imagePicker: imagePicker)));
   }
 }
 
