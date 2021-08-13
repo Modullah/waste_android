@@ -4,15 +4,16 @@ import 'dart:io';
 //import 'package:cross_file/src/types/interface.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+//import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart';
 //import 'package:flutter/services.dart';
 //import 'package:path_provider/path_provider.dart';
 
 class NewPost extends StatefulWidget {
-  final XFile? imagePicker;
+  final File imageFile;
   const NewPost({
     Key? key,
-    required this.imagePicker,
+    required this.imageFile,
   }) : super(key: key);
   @override
   _NewPostState createState() => _NewPostState();
@@ -22,13 +23,15 @@ class _NewPostState extends State<NewPost> {
   //final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   //var url;
   //var quantity;
-  late File imgPkr;
+  late File imgFile;
   Future uploadImage() async {
     //var imgPkrTmp = imgPkr;
-    File imagePath = File(imgPkr.path); //creates file path
+    String fileName = basename(widget.imageFile.path);
+    //File imagePath = File(_imgFile.path); //creates file path
     Reference reference =
-        FirebaseStorage.instance.ref().child(imgPkr.toString());
-    await reference.putFile(imagePath);
+        FirebaseStorage.instance.ref().child('files/$fileName');
+    await reference.putFile(widget.imageFile);
+    //print(imgFile);
     //await uploadBytes(quantity);
     //UploadTask uploadTask = reference.putFile(imagePath);
     //uploadTask.whenComplete(() async => url = await reference.getDownloadURL());
@@ -56,7 +59,7 @@ class _NewPostState extends State<NewPost> {
   void initState() {
     super.initState();
     //imgPkr = File(widget.imagePicker!.path);
-    imgPkr = File(widget.imagePicker!.path); //convert XFile to Type File
+    imgFile = File(this.widget.imageFile.path); //creates File obj
   }
 
   // Widget Img() {
@@ -75,12 +78,12 @@ class _NewPostState extends State<NewPost> {
           //mainAxisAlignment: MainAxisAlignment.center,
           children: [
             //const SizedBox(height: 20),
-            widget.imagePicker == null
+            imgFile.toString().isEmpty == true
                 ? CircularProgressIndicator(color: Colors.blueAccent.shade100)
                 : Container(
                     width: MediaQuery.of(context).size.width,
-                    child:
-                        Image.file(imgPkr, height: height, fit: BoxFit.cover)),
+                    child: Image.file(widget.imageFile,
+                        height: height, fit: BoxFit.cover)),
             //form()
           ],
         ),
