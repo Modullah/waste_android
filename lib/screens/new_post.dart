@@ -27,13 +27,10 @@ class _NewPostState extends State<NewPost> {
   void initState() {
     super.initState();
     imgFile = File(this.widget.imageFile.path);
-    waste = this.widget.currWaste;
   }
 
-  late File imgFile;
-  late Waste waste;
-
   dynamic id;
+  late File imgFile;
 
   var uuid = Uuid().v4();
   var quantity, imageUrl, date;
@@ -76,11 +73,11 @@ class _NewPostState extends State<NewPost> {
 
   captureData() {
     // string
-    waste.imageUrl = imageUrl;
+    widget.currWaste.imageUrl = imageUrl;
     // timestamp
-    waste.date = Timestamp.now().toDate();
+    widget.currWaste.date = Timestamp.now().toDate();
     // dynamic
-    waste.id = id;
+    widget.currWaste.id = id;
   }
 
   uploadButton(context) {
@@ -101,13 +98,14 @@ class _NewPostState extends State<NewPost> {
             _formKey.currentState!.save();
             await uploadImage();
             await captureData();
-            await uploadWaste(waste);
+            await uploadWaste(widget.currWaste);
             Navigator.of(context).pop();
           }
         });
   }
 
-  uploadWaste(Waste waste) async {
+  uploadWaste(Waste currWaste) async {
+    if (currWaste != widget.currWaste) return;
     final ref = FirebaseFirestore.instance.collection('waste').doc();
 
     await ref.set({
@@ -116,24 +114,6 @@ class _NewPostState extends State<NewPost> {
       "imageUrl": "$imageUrl",
       "date": "$date",
     });
-
-    // CollectionReference wasteRef =
-    //     FirebaseFirestore.instance.collection('waste');
-    // FirebaseFirestore.instance.runTransaction((Transaction transaction) async {
-    // CollectionReference reference =
-    //     FirebaseFirestore.instance.collection('waste');
-
-    //await ({"Title": "$title", "Author": "$author"});
-    // });
-    // final ref = FirebaseFirestore.instance.collection('waste').doc();
-    //var ref = FirebaseFirestore.instance.collection('waste').doc();
-    // await reference.add({
-    //   "quantity": waste.quantity,
-    //   "latitude": waste.latitude,
-    //   "longitude": waste.longitude,
-    //   "imageUrl": waste.imageUrl,
-    //   "date": waste.date,
-    // });
   }
 
   Widget keyboardInputForm() {
@@ -150,19 +130,40 @@ class _NewPostState extends State<NewPost> {
             textAlign: TextAlign.center,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             maxLength: 10,
-            initialValue: (waste.quantity).toString(),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter a value.';
-              } else {
-                print('Error');
-              }
-              return null;
-            },
-            onSaved: (value) => waste.quantity = int.parse(value!),
           ),
         ],
       ),
     );
   }
 }
+
+
+
+  //initialValue: (waste.quantity).toString(),
+  // validator: (value) {
+  //   if (value == null || value.isEmpty) {
+  //     return 'Please enter a value.';
+  //   } else {
+  //     print('Error');
+  //   }
+  //   return null;
+  // },
+  //onSaved: (value) => waste.quantity = int.parse(value!),
+
+  // CollectionReference wasteRef =
+  //     FirebaseFirestore.instance.collection('waste');
+  // FirebaseFirestore.instance.runTransaction((Transaction transaction) async {
+  // CollectionReference reference =
+  //     FirebaseFirestore.instance.collection('waste');
+
+  //await ({"Title": "$title", "Author": "$author"});
+  // });
+  // final ref = FirebaseFirestore.instance.collection('waste').doc();
+  //var ref = FirebaseFirestore.instance.collection('waste').doc();
+  // await reference.add({
+  //   "quantity": waste.quantity,
+  //   "latitude": waste.latitude,
+  //   "longitude": waste.longitude,
+  //   "imageUrl": waste.imageUrl,
+  //   "date": waste.date,
+  // });
