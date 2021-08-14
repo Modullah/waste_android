@@ -1,25 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:waste/models/waste.dart';
+import 'package:waste/screens/new_post.dart';
 import 'dart:io';
 
-import 'package:waste/screens/new_post.dart';
-
 class List extends StatefulWidget {
-  const List({Key? key}) : super(key: key);
+  final Waste currWaste;
+  const List({
+    Key? key,
+    required this.currWaste,
+  }) : super(key: key);
   @override
   _ListState createState() => _ListState();
 }
 
 class _ListState extends State<List> {
-  //File? image;
-  Future pickImage(ImageSource source) async {
-    final imagePicker = await ImagePicker().pickImage(source: source);
-    if (imagePicker == null) return;
-    final imageFile = File(imagePicker.path);
-    navNewPost(imageFile);
-  }
-
   //download data from db
   CollectionReference ref = FirebaseFirestore.instance.collection('waste');
 
@@ -56,9 +52,19 @@ class _ListState extends State<List> {
         onPressed: () => pickImage(ImageSource.gallery));
   }
 
+  Future pickImage(ImageSource source) async {
+    final imagePicker = await ImagePicker().pickImage(source: source);
+    if (imagePicker == null) return;
+    final imageFile = File(imagePicker.path);
+    navNewPost(imageFile);
+  }
+
   void navNewPost(File imageFile) async {
-    await Navigator.push(context,
-        MaterialPageRoute(builder: (context) => NewPost(imageFile: imageFile)));
+    await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                NewPost(imageFile: imageFile, currWaste: widget.currWaste)));
   }
 }
 

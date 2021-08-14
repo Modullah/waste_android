@@ -1,5 +1,6 @@
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_analytics/observer.dart';
+//import 'package:firebase_analytics/firebase_analytics.dart';
+//import 'package:firebase_analytics/observer.dart';
+import 'package:waste/models/waste.dart';
 import 'package:flutter/material.dart';
 import 'screens/list.dart';
 
@@ -11,7 +12,8 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
-  static FirebaseAnalytics analytics = FirebaseAnalytics();
+  Waste currWaste = Waste();
+  //static FirebaseAnalytics analytics = FirebaseAnalytics();
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -21,8 +23,10 @@ class _AppState extends State<App> {
             backgroundColor: Colors.black26, foregroundColor: Colors.white),
       ),
       debugShowCheckedModeBanner: false,
-      home: List(),
-      navigatorObservers: [FirebaseAnalyticsObserver(analytics: analytics)],
+      home: List(
+        currWaste: currWaste,
+      ),
+      //navigatorObservers: [FirebaseAnalyticsObserver(analytics: analytics)],
     );
   }
 }

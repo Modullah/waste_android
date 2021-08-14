@@ -10,10 +10,11 @@ import 'dart:io';
 
 class NewPost extends StatefulWidget {
   final File imageFile;
-
+  final Waste currWaste;
   const NewPost({
     Key? key,
     required this.imageFile,
+    required this.currWaste,
   }) : super(key: key);
 
   @override
@@ -28,13 +29,13 @@ class _NewPostState extends State<NewPost> {
     super.initState();
     retrieveLocation();
     imgFile = File(this.widget.imageFile.path);
-    currWaste = Waste();
+    waste = this.widget.currWaste;
   }
 
   late File imgFile;
+  late Waste waste;
   late bool srvcOn;
   late PermissionStatus prmsGrnt;
-  late Waste currWaste = Waste();
 
   dynamic id;
   LocationData? locationData;
@@ -109,14 +110,14 @@ class _NewPostState extends State<NewPost> {
 
   captureData() {
     // latitude and long both return a double
-    currWaste.latitude = locationData?.latitude;
-    currWaste.longitude = locationData?.longitude;
+    waste.latitude = locationData?.latitude;
+    waste.longitude = locationData?.longitude;
     // string
-    currWaste.imageUrl = imageUrl;
+    waste.imageUrl = imageUrl;
     // timestamp
-    currWaste.date = Timestamp.now().toDate();
+    waste.date = Timestamp.now().toDate();
     // dynamic
-    currWaste.id = id;
+    waste.id = id;
   }
 
   uploadButton(context) {
@@ -137,13 +138,13 @@ class _NewPostState extends State<NewPost> {
             _formKey.currentState!.save();
             await uploadImage();
             await captureData();
-            await uploadWaste(currWaste);
+            await uploadWaste(waste);
             Navigator.of(context).pop();
           }
         });
   }
 
-  uploadWaste(Waste currWaste) async {
+  uploadWaste(Waste waste) async {
     final ref = FirebaseFirestore.instance.collection('waste').doc();
 
     await ref.set({
@@ -154,12 +155,23 @@ class _NewPostState extends State<NewPost> {
       "imageUrl": "$imageUrl",
       "date": "$date",
     });
+
+    // CollectionReference wasteRef =
+    //     FirebaseFirestore.instance.collection('waste');
+    // FirebaseFirestore.instance.runTransaction((Transaction transaction) async {
+    // CollectionReference reference =
+    //     FirebaseFirestore.instance.collection('waste');
+
+    //await ({"Title": "$title", "Author": "$author"});
+    // });
+    // final ref = FirebaseFirestore.instance.collection('waste').doc();
+    //var ref = FirebaseFirestore.instance.collection('waste').doc();
     // await reference.add({
-    //   "quantity": currWaste.quantity,
-    //   "latitude": currWaste.latitude,
-    //   "longitude": currWaste.longitude,
-    //   "imageUrl": currWaste.imageUrl,
-    //   "date": currWaste.date,
+    //   "quantity": waste.quantity,
+    //   "latitude": waste.latitude,
+    //   "longitude": waste.longitude,
+    //   "imageUrl": waste.imageUrl,
+    //   "date": waste.date,
     // });
   }
 
@@ -177,7 +189,7 @@ class _NewPostState extends State<NewPost> {
             textAlign: TextAlign.center,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             maxLength: 10,
-            initialValue: (currWaste.quantity).toString(),
+            initialValue: (waste.quantity).toString(),
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter a value.';
@@ -186,7 +198,7 @@ class _NewPostState extends State<NewPost> {
               }
               return null;
             },
-            onSaved: (value) => this.currWaste.quantity = int.parse(value!),
+            onSaved: (value) => waste.quantity = int.parse(value!),
           ),
         ],
       ),
