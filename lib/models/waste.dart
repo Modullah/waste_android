@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class Waste {
   int? quantity;
   String? imageUrl;
@@ -16,6 +18,12 @@ class Waste {
     imageUrl = data['imageUrl'];
     date = data['date'];
     id = data['id'];
+  }
+
+  Waste.fromSnapshot({required AsyncSnapshot asyncSnap}) {
+    quantity = asyncSnap.data['quantity'];
+    imageUrl = asyncSnap.data['imageUrl'];
+    date = asyncSnap.data['date'].toDate();
   }
 
   Map<String, dynamic> toMap() {

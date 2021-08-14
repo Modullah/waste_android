@@ -5,14 +5,14 @@ import 'package:flutter/material.dart';
 import 'screens/list.dart';
 
 class App extends StatefulWidget {
-  const App({Key? key}) : super(key: key);
+  final Waste currWaste;
+  const App({Key? key, required this.currWaste}) : super(key: key);
 
   @override
   _AppState createState() => _AppState();
 }
 
 class _AppState extends State<App> {
-  Waste currWaste = Waste();
   //static FirebaseAnalytics analytics = FirebaseAnalytics();
   @override
   Widget build(BuildContext context) {
@@ -24,7 +24,7 @@ class _AppState extends State<App> {
       ),
       debugShowCheckedModeBanner: false,
       home: List(
-        currWaste: currWaste,
+        currWaste: widget.currWaste,
       ),
       //navigatorObservers: [FirebaseAnalyticsObserver(analytics: analytics)],
     );

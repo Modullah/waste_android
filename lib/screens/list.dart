@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:waste/models/waste.dart';
+import 'package:waste/screens/details.dart';
 import 'package:waste/screens/new_post.dart';
 import 'dart:io';
 
@@ -18,6 +19,8 @@ class List extends StatefulWidget {
 class _ListState extends State<List> {
   //download data from db
   CollectionReference ref = FirebaseFirestore.instance.collection('waste');
+
+  var asyncSnapshot;
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +43,14 @@ class _ListState extends State<List> {
                       return ListTile(
                         leading: Text(waste['quantity'].toString()),
                         title: Text('Placeholder'),
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => DetailsPage(
+                                      asyncSnapshot: asyncSnapshot,
+                                      currWaste: widget.currWaste)));
+                        },
                       );
                     });
           }),
