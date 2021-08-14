@@ -1,10 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class Waste {
   int? quantity;
   double? latitude, longitude;
   String? imageUrl;
-  Timestamp? date;
+  DateTime? date;
   dynamic id;
 
   Waste([

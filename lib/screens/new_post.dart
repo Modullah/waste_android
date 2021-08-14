@@ -26,6 +26,7 @@ class _NewPostState extends State<NewPost> {
   @override
   void initState() {
     super.initState();
+    retrieveLocation();
     imgFile = File(this.widget.imageFile.path);
     currWaste = Waste();
   }
@@ -98,12 +99,24 @@ class _NewPostState extends State<NewPost> {
                     width: MediaQuery.of(context).size.width,
                     child: Image.file(widget.imageFile,
                         height: height, fit: BoxFit.cover)),
-            form(),
+            keyboardInputForm(),
           ],
         ),
       ),
       bottomNavigationBar: uploadButton(context),
     );
+  }
+
+  captureData() {
+    // latitude and long both return a double
+    currWaste.latitude = locationData?.latitude;
+    currWaste.longitude = locationData?.longitude;
+    // string
+    currWaste.imageUrl = imageUrl;
+    // timestamp
+    currWaste.date = Timestamp.now().toDate();
+    // dynamic
+    currWaste.id = id;
   }
 
   uploadButton(context) {
@@ -123,6 +136,7 @@ class _NewPostState extends State<NewPost> {
           if (_formKey.currentState!.validate()) {
             _formKey.currentState!.save();
             await uploadImage();
+            await captureData();
             await uploadWaste(currWaste);
             Navigator.of(context).pop();
           }
@@ -130,18 +144,10 @@ class _NewPostState extends State<NewPost> {
   }
 
   uploadWaste(Waste currWaste) async {
-    // CollectionReference wasteRef =
-    //     FirebaseFirestore.instance.collection('waste');
-    // FirebaseFirestore.instance.runTransaction((Transaction transaction) async {
-    // CollectionReference reference =
-    //     FirebaseFirestore.instance.collection('waste');
-
-    //await ({"Title": "$title", "Author": "$author"});
-    // });
     final ref = FirebaseFirestore.instance.collection('waste').doc();
 
     await ref.set({
-      'docID': "$ref.id",
+      'doc_id': "$id",
       "quantity": "$quantity",
       "latitude": "$latitude",
       "longitude": "$longitude",
@@ -157,7 +163,7 @@ class _NewPostState extends State<NewPost> {
     // });
   }
 
-  Widget form() {
+  Widget keyboardInputForm() {
     return Form(
       key: _formKey,
       child: Column(
@@ -171,24 +177,8 @@ class _NewPostState extends State<NewPost> {
             textAlign: TextAlign.center,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             maxLength: 10,
-            onChanged: (value) {
-              // quantity = value;
-              setState(() {
-                currWaste.quantity = int.parse(value);
-
-                // latitude and long both return a double
-                currWaste.latitude = locationData?.latitude;
-                currWaste.longitude = locationData?.longitude;
-
-                // string
-                currWaste.imageUrl = imageUrl;
-                // timestamp
-                currWaste.date = Timestamp.now();
-                // dynamic
-                currWaste.id = id;
-              });
-            },
-            validator: (var value) {
+            initialValue: (currWaste.quantity).toString(),
+            validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter a value.';
               } else {
@@ -196,6 +186,7 @@ class _NewPostState extends State<NewPost> {
               }
               return null;
             },
+            onSaved: (value) => this.currWaste.quantity = int.parse(value!),
           ),
         ],
       ),
@@ -204,7 +195,9 @@ class _NewPostState extends State<NewPost> {
 }
 
 
-
+// quantity = value;
+//setState(() {});
+     
 // latitude returns a double
 // void rtrvLctn() async {
 //   // locationService
