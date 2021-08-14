@@ -10,24 +10,37 @@ import 'dart:io';
 
 class NewPost extends StatefulWidget {
   final File imageFile;
+
   const NewPost({
     Key? key,
     required this.imageFile,
   }) : super(key: key);
+
   @override
   _NewPostState createState() => _NewPostState();
 }
 
 class _NewPostState extends State<NewPost> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  //FirebaseFirestore firestore = FirebaseFirestore.instance;
-  late LocationData lctnData;
-  var quantity, imageUrl, latitude, longitude, date;
-  var uuid = Uuid().v4();
+
+  @override
+  void initState() {
+    super.initState();
+    imgFile = File(this.widget.imageFile.path);
+    currWaste = Waste();
+  }
+
   late File imgFile;
   late bool srvcOn;
   late PermissionStatus prmsGrnt;
   late Waste currWaste = Waste();
+
+  dynamic id;
+  LocationData? locationData;
+
+  var uuid = Uuid().v4();
+  var quantity, imageUrl, latitude, longitude, date;
+  var locationService = Location();
 
   Future uploadImage() async {
     String fileName = basename(widget.imageFile.path);
@@ -40,50 +53,33 @@ class _NewPostState extends State<NewPost> {
         .ref()
         .child('files/$fileName')
         .getDownloadURL();
-    // await reference.putFile(widget.imageFile);
-    // uploadTask.whenComplete(() async => url = await reference.getDownloadURL());
-    //await uploadBytes(quantity);
   }
 
-  // uploadBytes(String val) async {
-  //   var valStrPath = await _createFileFromString(val);
-  //   String valName = basename(valStrPath);
-  //   final valFileObj = File(valStrPath);
-  //   Reference reference =
-  //       FirebaseStorage.instance.ref().child('files/$valName');
-  //   await reference.putFile(valFileObj);
-  // }
+  void retrieveLocation() async {
+    try {
+      var _serviceEnabled = await locationService.serviceEnabled();
+      if (!_serviceEnabled) {
+        _serviceEnabled = await locationService.requestService();
+        if (!_serviceEnabled) {
+          print('Failed to enable service. Returning.');
+          return;
+        }
+      }
 
-  // Future<String> _createFileFromString(String val) async {
-  //   final encodedStr = val;
-  //   Uint8List bytes = base64.decode(encodedStr);
-  //   String dir = (await getApplicationDocumentsDirectory()).path;
-  //   File file = File(
-  //       "$dir/" + DateTime.now().millisecondsSinceEpoch.toString() + ".pdf");
-  //   await file.writeAsBytes(bytes);
-  //   return file.path;
-  // }
+      var _permissionGranted = await locationService.hasPermission();
+      if (_permissionGranted == PermissionStatus.denied) {
+        _permissionGranted = await locationService.requestPermission();
+        if (_permissionGranted != PermissionStatus.granted) {
+          print('Location service permission not granted. Returning.');
+        }
+      }
 
-  @override
-  void initState() {
-    super.initState();
-    imgFile = File(this.widget.imageFile.path); //creates File obj
-    rtrvLctn(); //retrieveLocation
-    currWaste = Waste();
-  }
-
-  void rtrvLctn() async {
-    var lcSrvc = Location(); //lcSrvc is locationService
-    srvcOn = await lcSrvc.serviceEnabled(); //type boolean
-    !srvcOn ? srvcOn = await lcSrvc.requestService() : srvcOn = false;
-
-    prmsGrnt = await lcSrvc.hasPermission(); //type PermissionStatus, if granted
-
-    prmsGrnt == PermissionStatus.denied
-        ? prmsGrnt = await lcSrvc.requestPermission()
-        : prmsGrnt = PermissionStatus.denied;
-
-    lctnData = await lcSrvc.getLocation();
+      locationData = await locationService.getLocation();
+    } on PlatformException catch (e) {
+      print('Error: ${e.toString()}, code: ${e.code}');
+      locationData = null;
+    }
+    locationData = await locationService.getLocation();
     setState(() {});
   }
 
@@ -113,10 +109,16 @@ class _NewPostState extends State<NewPost> {
   uploadButton(context) {
     return InkWell(
         child: Container(
-            height: 50,
-            color: Colors.blueAccent.shade100,
-            child: Icon(Icons.cloud_upload, size: 50)),
-        splashColor: Colors.blueAccent,
+          height: 50,
+          color: Colors.blueAccent.shade100,
+          child: Ink(
+            child: Icon(
+              Icons.cloud_upload,
+              size: 50,
+            ),
+            color: Colors.purpleAccent.shade100,
+          ),
+        ),
         onTap: () async {
           if (_formKey.currentState!.validate()) {
             _formKey.currentState!.save();
@@ -136,15 +138,10 @@ class _NewPostState extends State<NewPost> {
 
     //await ({"Title": "$title", "Author": "$author"});
     // });
-    final DocumentReference documentReference = 
-   var collection = FirebaseFirestore.instance.collection('waste');
-collection 
-    .doc('some_id') // <-- Doc ID where data should be updated.
-    .update({'key' : 'value'}) // <-- Updated data
-    .then((_) => print('Updated'))
-    .catchError((error) => print('Update failed: $error'));
+    final ref = FirebaseFirestore.instance.collection('waste').doc();
 
-    await reference.add({
+    await ref.set({
+      'docID': "$ref.id",
       "quantity": "$quantity",
       "latitude": "$latitude",
       "longitude": "$longitude",
@@ -178,12 +175,17 @@ collection
               // quantity = value;
               setState(() {
                 currWaste.quantity = int.parse(value);
-                currWaste.latitude =
-                    lctnData.latitude; //latitude returns a double
-                currWaste.longitude =
-                    lctnData.longitude; //longitude returns a double
+
+                // latitude and long both return a double
+                currWaste.latitude = locationData?.latitude;
+                currWaste.longitude = locationData?.longitude;
+
+                // string
                 currWaste.imageUrl = imageUrl;
+                // timestamp
                 currWaste.date = Timestamp.now();
+                // dynamic
+                currWaste.id = id;
               });
             },
             validator: (var value) {
@@ -200,3 +202,50 @@ collection
     );
   }
 }
+
+
+
+// latitude returns a double
+// void rtrvLctn() async {
+//   // locationService
+//   var lcSrvc = Location();
+
+//   // boolean
+//   var srvcOn = await lcSrvc.serviceEnabled();
+//   !srvcOn ? srvcOn = await lcSrvc.requestService() : srvcOn = false;
+
+//   // if permission granted
+//   var prmsGrnt = await lcSrvc.hasPermission();
+
+//   // if permission denied then request permission. If
+//   // permission denied is still true cont w/ status denied
+//   prmsGrnt == PermissionStatus.denied
+//       ? prmsGrnt = await lcSrvc.requestPermission()
+//       : prmsGrnt = PermissionStatus.denied;
+
+//   locationData = await lcSrvc.getLocation();
+//   setState(() {});
+// }
+
+// await reference.putFile(widget.imageFile);
+// uploadTask.whenComplete(() async => url = await reference.getDownloadURL());
+// await uploadBytes(quantity);
+
+  // uploadBytes(String val) async {
+  //   var valStrPath = await _createFileFromString(val);
+  //   String valName = basename(valStrPath);
+  //   final valFileObj = File(valStrPath);
+  //   Reference reference =
+  //       FirebaseStorage.instance.ref().child('files/$valName');
+  //   await reference.putFile(valFileObj);
+  // }
+
+  // Future<String> _createFileFromString(String val) async {
+  //   final encodedStr = val;
+  //   Uint8List bytes = base64.decode(encodedStr);
+  //   String dir = (await getApplicationDocumentsDirectory()).path;
+  //   File file = File(
+  //       "$dir/" + DateTime.now().millisecondsSinceEpoch.toString() + ".pdf");
+  //   await file.writeAsBytes(bytes);
+  //   return file.path;
+  // }
