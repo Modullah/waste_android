@@ -1,14 +1,11 @@
 class Waste {
   int? quantity;
-  double? latitude, longitude;
   String? imageUrl;
   DateTime? date;
   dynamic id;
 
   Waste([
     this.quantity,
-    this.latitude,
-    this.longitude,
     this.imageUrl,
     this.date,
     this.id,
@@ -16,8 +13,6 @@ class Waste {
 
   Waste.fromMap(Map<String, dynamic> data) {
     quantity = int.parse(data['quantity']);
-    latitude = data['latitude'];
-    longitude = data['longitude'];
     imageUrl = data['imageUrl'];
     date = data['date'];
     id = data['id'];
@@ -27,8 +22,6 @@ class Waste {
     return {
       'id': id,
       'quantity': quantity,
-      'latitude': latitude,
-      'longitude': longitude,
       'imageUrl': imageUrl,
       'date': date,
     };

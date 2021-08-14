@@ -67,15 +67,3 @@ class _ListState extends State<List> {
                 NewPost(imageFile: imageFile, currWaste: widget.currWaste)));
   }
 }
-
-//[pickImage(ImageSource.gallery)]
-// crclProgInd() {
-//   return Center(child: CircularProgressIndicator());
-// }
-
-
-  //pickImgGallery() {
-    //pickImage(ImageSource.gallery);
-    //Navigator.push(context, MaterialPageRoute(builder: (context) => Gallery()));
-  //}
-  //onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => Camera()))
