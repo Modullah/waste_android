@@ -40,7 +40,7 @@ class _NewPostState extends State<NewPost> {
     await FirebaseStorage.instance
         .ref()
         .child('files/$uuid/$fileName')
-        .putFile(widget.imageFile);
+        .putFile(imgFile);
 
     imageUrl = await FirebaseStorage.instance
         .ref()
